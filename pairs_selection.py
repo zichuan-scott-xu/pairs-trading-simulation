@@ -38,6 +38,8 @@ real_estate = ['SPG', 'PLD', 'AMT', 'PSA', 'EQIX', 'WELL', 'AVB', 'O', 'DLR', 'V
 
 list_of_stocks = real_estate + tech + food_drink + biotech + energy
 
+stocks500df = pd.read_csv('SP500.csv')
+list_of_stocks = stocks500df['Symbol']
 
 sd = datetime(2020, 5, 6) 
 ed = datetime(2023, 5, 5)
