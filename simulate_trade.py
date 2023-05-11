@@ -58,6 +58,7 @@ def simulate_standard_model(spread_pred, beta, mu, sigma, price_open_a, price_op
     else:
         invest_a, invest_b = 1, -beta
     hold_a, hold_b = invest_a / price_open_a[0], invest_b / price_open_a[0]
+    print(f'initial hold: {hold_a, hold_b}')
     init_invest = invest_a + invest_b
     invest = init_invest
     histories = []
@@ -70,6 +71,7 @@ def simulate_standard_model(spread_pred, beta, mu, sigma, price_open_a, price_op
             invest += invest_adjust
             invest_a, invest_b = -1, beta
             histories.append((t, invest_adjust, 'B')) # TODO: change history if needed
+            hold_a, hold_b = invest_a / price_open_a[t], invest_b / price_open_b[t]
             
         elif spread_pred[t] < mu - 1 * sigma and invest_a == -1: # switch from long B to long A
             invest_adjust = (1 - price_open_a[t] * hold_a) + (-beta - price_open_b[t] * hold_b)
@@ -77,8 +79,13 @@ def simulate_standard_model(spread_pred, beta, mu, sigma, price_open_a, price_op
             invest += invest_adjust
             invest_a, invest_b = 1, -beta
             histories.append((t, invest_adjust, 'A'))
-            
-        hold_a, hold_b = invest_a / price_open_a[t], invest_b / price_open_b[t]
+            hold_a, hold_b = invest_a / price_open_a[t], invest_b / price_open_b[t]
+    
+    # clear all investment
+    print(f'final hold: {hold_a, hold_b}')
+    invest -= (hold_a * price_close_final_a + hold_b * price_close_final_b)
+    return init_invest, invest, histories
+        
     
     # clear all investment
     invest += hold_a * price_close_final_a + hold_b * price_close_final_b
