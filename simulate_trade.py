@@ -65,14 +65,14 @@ def simulate_standard_model(spread_pred, beta, mu, sigma, price_open_a, price_op
     num_test = len(y_test)
     for t in range(num_test):
         if spread_pred[t] > mu + 1 * sigma and invest_a == 1: # switch from long A to long B
-            invest_adjust = (-1 - price_open_a[t] * hold_a) + (1 - price_open_b[t] * hold_b)
+            invest_adjust = (-1 - price_open_a[t] * hold_a) + (beta - price_open_b[t] * hold_b)
             print(f'Enter long B, short A at t={t}, invest_adjustment: {invest_adjust}')
             invest += invest_adjust
             invest_a, invest_b = -1, beta
             histories.append((t, invest_adjust, 'B')) # TODO: change history if needed
             
         elif spread_pred[t] < mu - 1 * sigma and invest_a == -1: # switch from long B to long A
-            invest_adjust = (1 - price_open_a[t] * hold_a) + (-1 - price_open_b[t] * hold_b)
+            invest_adjust = (1 - price_open_a[t] * hold_a) + (-beta - price_open_b[t] * hold_b)
             print(f'Enter long A, short B at t={t}, invest_adjustment: {invest_adjust}')
             invest += invest_adjust
             invest_a, invest_b = 1, -beta
