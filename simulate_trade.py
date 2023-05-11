@@ -85,11 +85,6 @@ def simulate_standard_model(spread_pred, beta, mu, sigma, price_open_a, price_op
     print(f'final hold: {hold_a, hold_b}')
     invest -= (hold_a * price_close_final_a + hold_b * price_close_final_b)
     return init_invest, invest, histories
-    
-    # clear all investment
-    print(f'final hold: {hold_a, hold_b}')
-    invest -= (hold_a * price_close_final_a + hold_b * price_close_final_b)
-    return init_invest, invest, histories
         
     
     # clear all investment
