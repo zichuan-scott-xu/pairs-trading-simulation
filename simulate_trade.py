@@ -53,7 +53,7 @@ def to_dataloader(X_train, y_train, X_test, y_test, batch_size):
 
 def simulate_standard_model(spread_pred, beta, mu, sigma, price_open_a, price_open_b, price_close_final_a, price_close_final_b):
     # Setup at t = 0
-    if spread_pred[0] > mu: # logprice2 - beta * logprice1 > alpha
+    if spread_pred[0] < mu: # logprice2 - beta * logprice1 < alpha, so long B
         invest_a, invest_b = -1, beta
     else:
         invest_a, invest_b = 1, -beta
@@ -65,21 +65,26 @@ def simulate_standard_model(spread_pred, beta, mu, sigma, price_open_a, price_op
 
     num_test = len(y_test)
     for t in range(num_test):
-        if spread_pred[t] > mu + 1 * sigma and invest_a == 1: # switch from long A to long B
+        if spread_pred[t] < mu - 1 * sigma and invest_a == 1: # switch from long A to long B
             invest_adjust = (-1 - price_open_a[t] * hold_a) + (beta - price_open_b[t] * hold_b)
             print(f'Enter long B, short A at t={t}, invest_adjustment: {invest_adjust}')
             invest += invest_adjust
             invest_a, invest_b = -1, beta
-            histories.append((t, invest_adjust, 'B')) # TODO: change history if needed
+            histories.append((t, invest_adjust, 'B'))
             hold_a, hold_b = invest_a / price_open_a[t], invest_b / price_open_b[t]
             
-        elif spread_pred[t] < mu - 1 * sigma and invest_a == -1: # switch from long B to long A
+        elif spread_pred[t] > mu + 1 * sigma and invest_a == -1: # switch from long B to long A
             invest_adjust = (1 - price_open_a[t] * hold_a) + (-beta - price_open_b[t] * hold_b)
             print(f'Enter long A, short B at t={t}, invest_adjustment: {invest_adjust}')
             invest += invest_adjust
             invest_a, invest_b = 1, -beta
             histories.append((t, invest_adjust, 'A'))
             hold_a, hold_b = invest_a / price_open_a[t], invest_b / price_open_b[t]
+    
+    # clear all investment
+    print(f'final hold: {hold_a, hold_b}')
+    invest -= (hold_a * price_close_final_a + hold_b * price_close_final_b)
+    return init_invest, invest, histories
     
     # clear all investment
     print(f'final hold: {hold_a, hold_b}')
